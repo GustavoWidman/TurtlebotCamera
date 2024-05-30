@@ -148,3 +148,4 @@ O pacote `main` inclui uma API que pode ser acessada pelo site ou por qualquer o
 
 A seguir eu demonstro o pacote em funcionamento, controlando o TurtleBOT no simulador `webots` usando a interface e depois o terminal, também chamando o serviço de emergência:
 
+[TurtlebotCamera Demo.webm](https://github.com/GustavoWidman/TurtlebotCamera/assets/123963822/75451729-561e-4250-99a1-1573316de7f9)
