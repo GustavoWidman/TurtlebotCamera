@@ -163,3 +163,4 @@ install/
 build/
 log/
 .vscode
+project_checksum.txt

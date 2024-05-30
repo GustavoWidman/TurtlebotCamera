@@ -6,7 +6,7 @@ from std_srvs.srv import Empty
 class RobotStopper2000:
 	def __init__(self):
 		self.node = rclpy.create_node('robot_stopper_2000') # type: ignore
-		self.client = self.node.create_client(Empty, '/emergency_stop_teleop')
+		self.client = self.node.create_client(Empty, '/emergency_stop')
 
 	def stop_robot(self):
 		self.node.get_logger().info('Waiting for the service to be available...')

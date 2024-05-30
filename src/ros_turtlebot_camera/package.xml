@@ -1,16 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>ros_turtlebot_teleop</name>
+  <name>ros_turtlebot_camera</name>
   <version>0.0.0</version>
-  <description>Ponderada 2 - ROS - TurtleBot Teleop</description>
+  <description>Ponderada 2 - ROS - TurtleBot Camera</description>
   <maintainer email="gustavo.widman@sou.inteli.edu.br">Gustavo Widman</maintainer>
   <license>CC0</license>
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
 
   <export>
     <build_type>ament_python</build_type>

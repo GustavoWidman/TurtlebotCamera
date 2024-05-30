@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+		<script type="text/javascript">
+			const image_websocket = new WebSocket('ws://localhost:8000/image');
+			let latencies = [];
+
+			image_websocket.onmessage = function(event) {
+			const json = JSON.parse(event.data);
+				document.getElementById('video_stream').src = `data:image/jpeg;base64,${json.bytes}`;
+
+				if ("timestamp" in json)
+					latencies.push(Date.now() - json.timestamp);
+
+				if (latencies.length > 10) {
+					const sum = latencies.reduce((a, b) => a + b, 0);
+					const avg = sum / latencies.length;
+					document.getElementById('latency').innerText = `Latência da imagem: ${Math.round(avg)}ms`;
+					latencies = [];
+				}
+			};
+
+			image_websocket.onopen = function(event) {
+				console.log('Connected to Image Websocket Server');
+			};
+
+			const status_websocket = new WebSocket('ws://localhost:8000/status');
+
+			status_websocket.onmessage = function(event) {
+				const json = JSON.parse(event.data);
+
+				switch (json.state) {
+					case 'forward':
+						document.getElementById('state').innerText = 'Andando para FRENTE';
+						break;
+					case 'left':
+						document.getElementById('state').innerText = 'Virando para a ESQUERDA';
+						break;
+					case 'right':
+						document.getElementById('state').innerText = 'Virando para a DIREITA';
+						break;
+					case 'backward':
+						document.getElementById('state').innerText = 'Andando para TRÁS';
+						break;
+					case 'stopped':
+						document.getElementById('state').innerText = 'PARADO';
+						break;
+				}
+
+				document.getElementById('vel_linear').innerText = `Velocidade Linear: ${json.speed.linear}`;
+				document.getElementById('vel_angular').innerText = `Velocidade Angular: ${json.speed.angular}`;
+			};
+
+			status_websocket.onopen = function(event) {
+				console.log('Connected to Status Websocket Server');
+			};
+
+			status_websocket.onclose = function(event) {
+				console.log('Disconnected from Status Websocket Server');
+				document.getElementById('state').innerText = 'MORTO';
+				document.getElementById('vel_linear').innerText = `Velocidade Linear: 0`;
+				document.getElementById('vel_angular').innerText = `Velocidade Angular: 0`;
+			};
+
+		</script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css" >
+	</head>
+	<body>
+		<div class='section has-text-centered' style="display: flex; justify-content: center; flex-direction: column; align-items: center; padding-top: 15px; ">
+			<div class="box has-text-centered" style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 20px; margin-top: 10px; width: fit-content; height: fit-content; padding-bottom: 10px;">
+				<div style="width: fit-content; height: fit-content;">
+					<p class='title mb-3'>Webcam do Robô</p>
+					<div>
+						<figure class="image is-640x480">
+							<img id="video_stream" alt="Webcam do Robô" style="width: 320px; height: 240px;" />
+						</figure>
+					</div>
+					<div class="mt-3">
+						<p class='subtitle my-0 py-0' id="latency">Latência da imagem: ?ms</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="box has-text-centered" style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 20px; margin-top: 10px; height: fit-content; padding-bottom: 10px; width: 300px">
+				<p class='subtitle my-0 py-0' id="state">PARADO</p>
+				<p class='subtitle my-0 py-0' id="vel_linear">Velocidade Linear: ?</p>
+				<p class='subtitle my-0 py-0' id="vel_angular">Velocidade Angular: ?</p>
+			</div>
+
+			<div>
+				<button class='button is-link' onclick="fetch('/control?state=forward')">↑</button>
+			</div>
+			<div>
+				<button class='button is-link my-1' onclick="fetch('/control?state=left')">←</button>
+				<button class='button is-warning my-1' onclick="fetch('/control?state=stopped')">●</button>
+				<button class='button is-link my-1' onclick="fetch('/control?state=right')">→</button>
+			</div>
+			<div>
+				<button class='button is-link' onclick="fetch('/control?state=backward')">↓</button>
+			</div>
+
+			<div class="mt-4">
+				<button class='button is-danger' onclick="fetch('/emergency')">Emergência</button>
+			</div>
+		</div>
+	</body>
+</html>
